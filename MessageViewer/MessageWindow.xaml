@@ -1,0 +1,23 @@
+﻿<Window x:Class="MessageViewer.MessageWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MessageViewer"
+        mc:Ignorable="d"
+        Title="MessageWindow" Height="600" Width="800">
+    <StackPanel>
+        <Label Margin="10,5,10,0">MessageId</Label>
+        <TextBox Margin="10,5,10,0" Name="lblMessageId" />
+        <Label Margin="10,5,10,0">Expires At</Label>
+        <TextBox Margin="10,5,10,0" Name="lblExpiresAt" />
+        <Label Margin="10,5,10,0">MessageBody</Label>
+        <TextBox Margin="10,5,10,0" Name="tbxBody"  Height="155"/>
+        <Label Margin="10,5,10,0">User Properties</Label>
+        <ListView Height="155" Margin="10,5,10,0">
+            
+        </ListView>
+        <Button x:Name="btnDeleteMessage" Margin="10,10,10,0" Content="Delete This Message"/>
+        <Button x:Name="btnCloseWindow" Margin="10,10,10,0" Content="Close this Window"/>
+    </StackPanel>
+</Window>

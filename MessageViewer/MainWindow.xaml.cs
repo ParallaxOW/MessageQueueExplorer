@@ -1,9 +1,11 @@
-﻿using Microsoft.Azure.ServiceBus;
+﻿using MessageViewer.Domain;
+using Microsoft.Azure.ServiceBus;
 
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,9 +22,9 @@ namespace MessageViewer
         static IQueueClient queueClient;
         
         private string _connString;
-        private ObservableCollection<MessageObject> _messages = new ObservableCollection<MessageObject>();
+        private ObservableCollection<QueueMessage> _messages = new ObservableCollection<QueueMessage>();
 
-        public ObservableCollection<MessageObject> Messages
+        public ObservableCollection<QueueMessage> Messages
         {
             get { return _messages; }
             set
@@ -49,17 +51,25 @@ namespace MessageViewer
 
             btnConnect.Click += new RoutedEventHandler(btnConnect_Click);
             btnSendMsg.Click += new RoutedEventHandler(btnSendMsg_Click);
+            btnSendMsg2.Click += new RoutedEventHandler(btnSendMsg2_Click);
+            lbxMessages.MouseDoubleClick += lbxMessages_MouseDoubleClick;
 
             lbxMessages.ItemsSource = _messages;
             lbxMessages.DisplayMemberPath = "MessageString";
             DataContext = this;
         }
 
+        private void lbxMessages_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            MessageWindow msgWindow = new MessageWindow((QueueMessage)lbxMessages.SelectedItem, queueClient);
+            msgWindow.Show();
+        }
+
         private async void btnSendMsg_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                string messageBody = $"This is my test message {DateTimeOffset.UtcNow}";
+                string messageBody = $"This is a test non-JSON message {DateTimeOffset.UtcNow}";
                 Message msg = new Message(Encoding.UTF8.GetBytes(messageBody));
                 msg.MessageId = Guid.NewGuid().ToString();
 
@@ -71,16 +81,47 @@ namespace MessageViewer
             }
         }
 
-        private async void MenuItemDelete_Click(object sender, RoutedEventArgs e)
+        private async void btnSendMsg2_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string messageBody = string.Format("{{'firstname':'{0}', 'lastname':'{1}', 'date':'{2}'}}", "Russ", "Langel", DateTimeOffset.UtcNow);
+                Message msg = new Message(Encoding.UTF8.GetBytes(messageBody));
+                msg.MessageId = Guid.NewGuid().ToString();
+
+                await queueClient.SendAsync(msg);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void MenuItemViewMessage_Click(object sender, RoutedEventArgs e)
         {
             if (lbxMessages.SelectedIndex == -1) return;
 
-            MessageObject obj = ((MessageObject)lbxMessages.Items[lbxMessages.SelectedIndex]);
+            QueueMessage obj = ((QueueMessage)lbxMessages.Items[lbxMessages.SelectedIndex]);
 
-            var lockToken = obj.LockToken;
+            MessageWindow msgWindow = new MessageWindow(obj, queueClient);
+            msgWindow.Show();
+        }
 
-            await queueClient.CompleteAsync(lockToken);
+        private async void MenuItemDelete_Click(object sender, RoutedEventArgs e)
+        {
+            if (lbxMessages.SelectedIndex == -1) return;
+            QueueMessage obj = ((QueueMessage)lbxMessages.Items[lbxMessages.SelectedIndex]);
 
+            //since we can potentially have multiple copies of the same message picked up by the message receiver
+            //lets try to remove the one we're on, and if it fails because the lock expired, let's look for another one.  
+            try
+            {
+                await queueClient.CompleteAsync(obj.LockToken);
+
+            } catch (MessageLockLostException mlle)
+            {
+                MessageBox.Show("Lock expired, removing from the list.  Another copy of this message may still be in this list!");
+            }
             _messages.Remove(obj);
         }
 
@@ -93,10 +134,13 @@ namespace MessageViewer
             {
                 try
                 {
-                    queueClient = new QueueClient(tbxConnStrings.Text, tbxQueue.Text, ReceiveMode.PeekLock);
+                    string queueName = cbxDeadLetter.IsChecked.Value ? EntityNameHelper.FormatDeadLetterPath(tbxQueue.Text) : $"{tbxQueue.Text}";
+                    
+                    queueClient = new QueueClient(tbxConnStrings.Text, queueName, ReceiveMode.PeekLock);
                     RegisterOnMessageHandlerAndReceiveMessages();
                     MessageBox.Show("Connection Successful!");
-                }catch(Exception exc)
+                }
+                catch (Exception exc)
                 {
                     MessageBox.Show(exc.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
@@ -112,15 +156,11 @@ namespace MessageViewer
             try
             {
                 string messageBody = $"{Encoding.UTF8.GetString(message.Body)}";
+                QueueMessage msg = new QueueMessage { Message = message };
+
                 App.Current.Dispatcher.Invoke((Action)delegate 
                 {
-                    MessageObject obj = new MessageObject
-                    {
-                        MessageString = messageBody,
-                        MessageId = message.MessageId,
-                        LockToken = message.SystemProperties.LockToken
-                    };
-                    _messages.Add(obj);
+                    _messages.Add(msg);
                 });
             }
             catch (Exception exc)
@@ -153,13 +193,6 @@ namespace MessageViewer
             // Register the function that will process messages
             queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
         }
-    }
-
-    public class MessageObject
-    {
-        public string MessageString { get; set; }
-        public string MessageId { get; set; }
-        public string LockToken { get; set; }
     }
 
 }
