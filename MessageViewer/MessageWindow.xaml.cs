@@ -47,6 +47,10 @@ namespace MessageViewer
 
             btnCloseWindow.Click += btnCloseWindow_Click;
             btnDeleteMessage.Click += btnDeleteMessage_Click;
+
+            var userProps = message.Message.UserProperties.ToList();
+
+            lvUserProperties.ItemsSource = userProps;
         }
 
         private async void btnDeleteMessage_Click(object sender, RoutedEventArgs e)

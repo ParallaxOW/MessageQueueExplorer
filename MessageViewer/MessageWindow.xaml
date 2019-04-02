@@ -14,8 +14,13 @@
         <Label Margin="10,5,10,0">MessageBody</Label>
         <TextBox Margin="10,5,10,0" Name="tbxBody"  Height="155"/>
         <Label Margin="10,5,10,0">User Properties</Label>
-        <ListView Height="155" Margin="10,5,10,0">
-            
+        <ListView Height="155" Margin="10,5,10,0" Name="lvUserProperties">
+            <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="User Property Key" DisplayMemberBinding="{Binding Key}" Width="150" />
+                        <GridViewColumn Header="User Property Value" DisplayMemberBinding="{Binding Value}" Width="550" />
+                    </GridView>
+            </ListView.View>
         </ListView>
         <Button x:Name="btnDeleteMessage" Margin="10,10,10,0" Content="Delete This Message"/>
         <Button x:Name="btnCloseWindow" Margin="10,10,10,0" Content="Close this Window"/>

@@ -25,6 +25,7 @@
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListBox>
+        
         <Button x:Name="btnSendMsg" Margin="10,10,10,0" Content="Drop Message 1"/>
         <Button x:Name="btnSendMsg2" Margin="10,10,10,0" Content="Drop Message 2"/>
     </StackPanel>

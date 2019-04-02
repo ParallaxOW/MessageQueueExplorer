@@ -1,11 +1,12 @@
 ﻿using MessageViewer.Domain;
 using Microsoft.Azure.ServiceBus;
-
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,7 +45,6 @@ namespace MessageViewer
             }
         }
 
-
         public MainWindow()
         {
             InitializeComponent();
@@ -52,12 +52,15 @@ namespace MessageViewer
             btnConnect.Click += new RoutedEventHandler(btnConnect_Click);
             btnSendMsg.Click += new RoutedEventHandler(btnSendMsg_Click);
             btnSendMsg2.Click += new RoutedEventHandler(btnSendMsg2_Click);
+
             lbxMessages.MouseDoubleClick += lbxMessages_MouseDoubleClick;
 
             lbxMessages.ItemsSource = _messages;
             lbxMessages.DisplayMemberPath = "MessageString";
             DataContext = this;
         }
+
+        
 
         private void lbxMessages_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -72,6 +75,14 @@ namespace MessageViewer
                 string messageBody = $"This is a test non-JSON message {DateTimeOffset.UtcNow}";
                 Message msg = new Message(Encoding.UTF8.GetBytes(messageBody));
                 msg.MessageId = Guid.NewGuid().ToString();
+
+                msg.UserProperties.Add("DateTime", DateTime.UtcNow);
+                Random rand = new Random();
+
+                for (int i = 1; i <= 10; i++)
+                {
+                    msg.UserProperties.Add($"Random Number {i}", rand.Next(25000, 40000));
+                }
 
                 await queueClient.SendAsync(msg);
             }
@@ -88,6 +99,14 @@ namespace MessageViewer
                 string messageBody = string.Format("{{'firstname':'{0}', 'lastname':'{1}', 'date':'{2}'}}", "Russ", "Langel", DateTimeOffset.UtcNow);
                 Message msg = new Message(Encoding.UTF8.GetBytes(messageBody));
                 msg.MessageId = Guid.NewGuid().ToString();
+
+                msg.UserProperties.Add("DateTime", DateTime.UtcNow);
+                Random rand = new Random();
+
+                for (int i = 1; i <= 10; i++)
+                {
+                    msg.UserProperties.Add($"Random Number {i}", rand.Next(10000, 25000));
+                }
 
                 await queueClient.SendAsync(msg);
             }
@@ -194,5 +213,4 @@ namespace MessageViewer
             queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
         }
     }
-
 }
