@@ -60,8 +60,6 @@ namespace MessageViewer
             DataContext = this;
         }
 
-        
-
         private void lbxMessages_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             MessageWindow msgWindow = new MessageWindow((QueueMessage)lbxMessages.SelectedItem, queueClient);

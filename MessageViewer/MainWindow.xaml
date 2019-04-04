@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MessageViewer"
         mc:Ignorable="d"
-        Title="Message Queue Explorer" Height="631.041">
+        Title="Message Queue Explorer" Height="562.671">
     <StackPanel Margin="2,-6,-2,6">
         <Label Margin="10,10,10,0">
             Connection String
@@ -26,7 +26,7 @@
             </ListBox.ContextMenu>
         </ListBox>
         
-        <Button x:Name="btnSendMsg" Margin="10,10,10,0" Content="Drop Message 1"/>
-        <Button x:Name="btnSendMsg2" Margin="10,10,10,0" Content="Drop Message 2"/>
+        <Button x:Name="btnSendMsg" Margin="10,10,10,0" Content="Drop Message 1" Visibility="Hidden"/>
+        <Button x:Name="btnSendMsg2" Margin="10,10,10,0" Content="Drop Message 2"  Visibility="Hidden"/>
     </StackPanel>
 </Window>
