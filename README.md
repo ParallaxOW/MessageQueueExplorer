@@ -1,6 +1,8 @@
 ## Message Viewer
 
-This application is intended to allow a user to peek onto the service bus.  
+This application is intended to allow a user to peek onto the Azure Service Bus.
+
+##### NOTE: This currently only supports QUEUEs. SB TOPICs are currently a work in progress.
 
 Use:  
 
