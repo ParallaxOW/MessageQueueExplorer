@@ -1,5 +1,20 @@
 ## Message Viewer
 
+Problem
+
+
+Solution 
+
+Use Cases
+
+Why write an app:  Cause nothing exists 
+
+Why open source: Hope to get others intrested in this product and get free help. Give back to the community.  
+
+Long term: Hope someone not us takes owmership of this product.  
+
+
+
 This application is intended to allow a user to peek onto the Azure Service Bus.
 
 ##### NOTE: This currently only supports QUEUEs. SB TOPICs are currently a work in progress.
