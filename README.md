@@ -1,6 +1,5 @@
 ## Message Viewer
 
-
 > ##### Problem
 > + No utility out there to read the contents of a Service Bus (SB) message
 > 
@@ -9,8 +8,8 @@
 > 
 > ##### Use Cases
 > + We currently have several stories in our sprint in which the final result of the story is placing a message on a SB queue
-> 	+ This story is currently not independently not testable
-> 	+ This utility makes this story testable in that the QA team can view the contents of messages
+> 	+ This story is currently not independently testable
+> 	+ This utility makes this story independently testable in that the QA team can view the contents of messages
 > + Production Support teams would be able to view contents of SB Messages as part of troubleshooting
 > 
 > ##### Why write an app:  
