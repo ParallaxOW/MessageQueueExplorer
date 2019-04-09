@@ -1,26 +1,27 @@
 ## Message Viewer
 
 
-> Problem
-> No utility out there to read the contents of a Service Bus (SB) message.  
+> ##### Problem
+> + No utility out there to read the contents of a Service Bus (SB) message
 > 
-> Solution 
-> This utility will give the user visibility into the contents of the SB messages as well as the User Properties attached to the message.  
+> ##### Solution 
+> + This utility will give the user visibility into the contents of the SB messages as well as the User Properties attached to the message
 > 
-> Use Cases
+> ##### Use Cases
 > + We currently have several stories in our sprint in which the final result of the story is placing a message on a SB queue
 > 	+ This story is currently not independently not testable
 > 	+ This utility makes this story testable in that the QA team can view the contents of messages
 > + Production Support teams would be able to view contents of SB Messages as part of troubleshooting
 > 
-> Why write an app:  
-> +  Cause nothing exists 
+> ##### Why write an app:  
+> +  Cause nothing exists and we need a solution for this
 > 
-> Why open source: 
-> + Hope to get others intrested in this product and get free help. Give back to the community.  
+> ##### Why open source: 
+> + Hope to get others intrested in this product and get free help
+> + Give back to the community
 > 
-> Long term: 
-> + Hope someone not us takes ownership of this product.  
+> ##### Long term: 
+> + Hope someone not us takes ownership of this product.
 
 This application is intended to allow a user to peek onto the Azure Service Bus.
 
