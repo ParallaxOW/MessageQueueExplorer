@@ -39,7 +39,7 @@ namespace MessageViewer
             {
                 dynamic desObj = JsonConvert.DeserializeObject(SelectedMessage.MessageString);
                 messageText = JsonConvert.SerializeObject(desObj, new JsonSerializerSettings { Formatting = Formatting.Indented });
-            }catch(Exception exc)
+            }catch
             {
                 messageText = SelectedMessage.MessageString;
             }
@@ -62,7 +62,7 @@ namespace MessageViewer
             }
             catch (MessageLockLostException mlle)
             {
-                MessageBox.Show("Lock Token expired, can't remove this message!");
+                MessageBox.Show($"Lock Token expired, can't remove this message! [{mlle.Message}]");
             }
         }
 

@@ -1,17 +1,12 @@
 ﻿using MessageViewer.Domain;
 using Microsoft.Azure.ServiceBus;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace MessageViewer
 {
@@ -22,7 +17,6 @@ namespace MessageViewer
     {
         static IQueueClient queueClient;
         
-        private string _connString;
         private ObservableCollection<QueueMessage> _messages = new ObservableCollection<QueueMessage>();
 
         public ObservableCollection<QueueMessage> Messages
@@ -75,10 +69,9 @@ namespace MessageViewer
                 string messageBody = $"This is a test non-JSON message {DateTimeOffset.UtcNow}";
                 Message msg = new Message(Encoding.UTF8.GetBytes(messageBody));
                 msg.MessageId = Guid.NewGuid().ToString();
-
                 msg.UserProperties.Add("DateTime", DateTime.UtcNow);
-                Random rand = new Random();
 
+                Random rand = new Random();
                 for (int i = 1; i <= 10; i++)
                 {
                     msg.UserProperties.Add($"Random Number {i}", rand.Next(25000, 40000));
@@ -97,12 +90,12 @@ namespace MessageViewer
             try
             {
                 string messageBody = string.Format("{{'firstname':'{0}', 'lastname':'{1}', 'date':'{2}'}}", "Russ", "Langel", DateTimeOffset.UtcNow);
+
                 Message msg = new Message(Encoding.UTF8.GetBytes(messageBody));
                 msg.MessageId = Guid.NewGuid().ToString();
-
                 msg.UserProperties.Add("DateTime", DateTime.UtcNow);
-                Random rand = new Random();
 
+                Random rand = new Random();
                 for (int i = 1; i <= 10; i++)
                 {
                     msg.UserProperties.Add($"Random Number {i}", rand.Next(10000, 25000));
@@ -116,7 +109,7 @@ namespace MessageViewer
             }
         }
 
-        private async void MenuItemViewMessage_Click(object sender, RoutedEventArgs e)
+        private void MenuItemViewMessage_Click(object sender, RoutedEventArgs e)
         {
             if (lbxMessages.SelectedIndex == -1) return;
 
@@ -131,15 +124,13 @@ namespace MessageViewer
             if (lbxMessages.SelectedIndex == -1) return;
             QueueMessage obj = ((QueueMessage)lbxMessages.Items[lbxMessages.SelectedIndex]);
 
-            //since we can potentially have multiple copies of the same message picked up by the message receiver
-            //lets try to remove the one we're on, and if it fails because the lock expired, let's look for another one.  
             try
             {
                 await queueClient.CompleteAsync(obj.LockToken);
 
             } catch (MessageLockLostException mlle)
             {
-                MessageBox.Show("Lock expired, removing from the list.  Another copy of this message may still be in this list!");
+                MessageBox.Show($"Lock expired, removing from the list.  Another copy of this message may still be in this list! [{mlle.Message}]");
             }
             _messages.Remove(obj);
         }
@@ -170,6 +161,8 @@ namespace MessageViewer
             }
         }
 
+        //supressing the ASYNC/AWAIT warning.  this method has to be an async task to work with the QueueClient.RegisterMessageHandler function it's being passed to.
+        #pragma warning disable CS1998
         protected async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
             try
